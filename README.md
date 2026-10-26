@@ -8,7 +8,7 @@ An unofficial Lidarr fork focused on accurate ALAC quality classification during
 
 ## What changes
 
-Lidarr caches media quality information for track files. This patch refreshes and persists stale ALAC classifications before upgrade decisions, so ALAC files are compared in the appropriate quality tier. Focused tests cover stale cached entries, 16-bit ALAC, unrelated formats, corrupt ALAC data, and upgrade decisions.
+Lidarr caches media quality information for track files. When TagLib does not report ALAC bit depth, this patch reads the ALAC configuration in the M4A file, refreshes the cached quality, and persists it before upgrade decisions. This lets Lidarr compare 24-bit ALAC in the correct tier instead of treating it like a lower-bit-depth file. Invalid or unverifiable metadata is rejected rather than used to justify a downgrade. The focused ALAC test fixture passes all 19 cases, including 16- and 24-bit files, corrupted headers, and upgrade decisions.
 
 This patch corrects classification; it does not convert audio files or guarantee that an ALAC release is available from your sources.
 
