@@ -38,14 +38,42 @@ namespace NzbDrone.Core.MediaFiles
             using (var file = TagLib.File.Create(trackFile.Path))
             {
                 var audio = file.Properties.Codecs.OfType<IAudioCodec>().FirstOrDefault();
-                if (audio == null || file.PossiblyCorrupt || file.Properties.BitsPerSample == 0)
+                if (audio == null || file.PossiblyCorrupt)
                 {
                     // Do not accept a possible downgrade when the old file's
                     // lossless quality could not be established reliably.
                     throw new InvalidOperationException($"Unable to verify cached ALAC quality: {trackFile.Path}");
                 }
 
-                var quality = QualityParser.ParseQuality(trackFile.Path, audio.Description, audio.AudioBitrate, file.Properties.BitsPerSample);
+                var bitsPerSample = file.Properties.BitsPerSample;
+                var bitRate = audio.AudioBitrate;
+                var sampleRate = audio.AudioSampleRate;
+                if (audio.Description.Contains("alac", StringComparison.OrdinalIgnoreCase))
+                {
+                    var alacConfiguration = AlacBitDepthReader.Read(trackFile.Path);
+                    if (alacConfiguration.HasValue)
+                    {
+                        bitsPerSample = alacConfiguration.Value.BitDepth;
+                        if (alacConfiguration.Value.BitRate > 0 && alacConfiguration.Value.BitRate <= int.MaxValue)
+                        {
+                            bitRate = (int)alacConfiguration.Value.BitRate;
+                        }
+
+                        if (alacConfiguration.Value.SampleRate > 0 && alacConfiguration.Value.SampleRate <= int.MaxValue)
+                        {
+                            sampleRate = (int)alacConfiguration.Value.SampleRate;
+                        }
+                    }
+                }
+
+                if (bitsPerSample == 0)
+                {
+                    // Do not accept a possible downgrade when the old file's
+                    // lossless quality could not be established reliably.
+                    throw new InvalidOperationException($"Unable to verify cached ALAC quality: {trackFile.Path}");
+                }
+
+                var quality = QualityParser.ParseQuality(trackFile.Path, audio.Description, bitRate, bitsPerSample);
 
                 // Correct the codec tier without discarding release/proper
                 // revisions that Lidarr already recorded for this same file.
@@ -53,10 +81,10 @@ namespace NzbDrone.Core.MediaFiles
                 var info = new MediaInfoModel
                 {
                     AudioFormat = audio.Description,
-                    AudioBitrate = audio.AudioBitrate,
+                    AudioBitrate = bitRate,
                     AudioChannels = audio.AudioChannels,
-                    AudioBits = file.Properties.BitsPerSample,
-                    AudioSampleRate = audio.AudioSampleRate
+                    AudioBits = bitsPerSample,
+                    AudioSampleRate = sampleRate
                 };
 
                 var oldQuality = trackFile.Quality;
