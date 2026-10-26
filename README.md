@@ -1,5 +1,7 @@
 # Lidarr/ALAC
 
+I live in the Apple ecosystem, so ALAC is my preferred lossless format. My Lidarr quality profile is set to prefer 24-bit ALAC, then 24-bit FLAC, followed by standard ALAC and FLAC. But since Lidarr added higher bit-depth qualities about five years ago, those preferences haven’t always been honored: my library could be upgraded to lower bit-depth versions. This patch fixes the underlying ALAC quality classification so Lidarr can make upgrade decisions using the correct bit depth and follow the profile’s ranking.
+
 An unofficial Lidarr fork focused on accurate ALAC quality classification during upgrade decisions. It is based on the upstream Lidarr code in this repository. The patched default branch is [`alac`](https://github.com/rtm135/Lidarr-ALAC/tree/alac).
 
 ## What changes
