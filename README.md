@@ -1,4 +1,20 @@
-# Lidarr
+# Lidarr-ALAC
+
+An unofficial Lidarr fork focused on correcting cached ALAC quality before upgrade decisions. The `alac` branch is the patched default branch.
+
+## ALAC cached-quality change
+
+Lidarr can retain cached media quality classifications. This change refreshes and persists stale ALAC classifications before upgrade decisions, so an ALAC file is evaluated in the correct quality tier. It includes focused tests for old cached entries, 16-bit classification, preservation of unrelated formats, corrupt ALAC handling, and upgrade/downgrade decisions.
+
+This repository currently provides source code only; it does not publish a fork-specific installer or container image. To try the patch, build the `alac` branch using the upstream [development and build documentation](https://wiki.servarr.com/lidarr/development). Back up your Lidarr database and configuration before testing, and use a test library where possible.
+
+Tester feedback is welcome through [GitHub Issues](https://github.com/rtm135/Lidarr-ALAC/issues). Please include the Lidarr version, operating system/architecture, reproduction steps, and sanitized logs. Do not post credentials, private tracker details, or copyrighted audio.
+
+This is an independent, unofficial fork of [Lidarr](https://github.com/Lidarr/Lidarr), not an official release. The patch changes upgrade-time classification; it does not convert audio files or guarantee an ALAC release is available from your sources.
+
+---
+
+[Upstream Lidarr README](https://github.com/Lidarr/Lidarr/blob/develop/README.md) and project credits follow.
 
 [![Build Status](https://dev.azure.com/Lidarr/Lidarr/_apis/build/status/lidarr.Lidarr?branchName=develop)](https://dev.azure.com/Lidarr/Lidarr/_build/latest?definitionId=1&branchName=develop)
 [![Translation status](https://translate.servarr.com/widget/servarr/lidarr/svg-badge.svg)](https://translate.servarr.com/engage/servarr/?utm_source=widget)
